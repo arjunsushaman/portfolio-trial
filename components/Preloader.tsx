@@ -13,27 +13,19 @@ export default function Preloader({ onComplete }: PreloaderProps) {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // Animate progress bar
     const interval = setInterval(() => {
       setProgress((p) => {
-        if (p >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
+        if (p >= 100) { clearInterval(interval); return 100; }
         return p + 2;
       });
     }, 40);
 
-    // Hide preloader after 2.5s
     const timer = setTimeout(() => {
       setShow(false);
       setTimeout(onComplete, 700);
     }, 2500);
 
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timer);
-    };
+    return () => { clearInterval(interval); clearTimeout(timer); };
   }, [onComplete]);
 
   const letters = personal.name.split('');
@@ -42,31 +34,33 @@ export default function Preloader({ onComplete }: PreloaderProps) {
     <AnimatePresence>
       {show && (
         <motion.div
-          className="fixed inset-0 z-[99997] flex flex-col items-center justify-center bg-background"
+          className="fixed inset-0 z-[99997] flex flex-col items-center justify-center bg-background overflow-hidden"
           initial={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.6, ease: 'easeInOut' } }}
+          exit={{ opacity: 0, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] } }}
         >
-          {/* Name reveal */}
-          <div className="overflow-hidden mb-8">
+          {/* Ambient glow */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[radial-gradient(ellipse,rgba(0,255,245,0.05)_0%,transparent_70%)]" />
+          </div>
+
+          {/* Letter-by-letter name reveal */}
+          <div className="overflow-hidden mb-3 relative z-10">
             <motion.div
-              className="flex gap-1"
+              className="flex gap-[2px]"
               initial="hidden"
               animate="visible"
               variants={{
                 hidden: {},
-                visible: { transition: { staggerChildren: 0.06, delayChildren: 0.2 } },
+                visible: { transition: { staggerChildren: 0.055, delayChildren: 0.15 } },
               }}
             >
               {letters.map((letter, i) => (
                 <motion.span
                   key={i}
-                  className="font-syne text-4xl md:text-6xl font-bold tracking-tight text-white"
+                  className="font-syne text-5xl md:text-7xl font-bold tracking-tight text-white"
                   variants={{
                     hidden: { y: '110%' },
-                    visible: {
-                      y: '0%',
-                      transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
-                    },
+                    visible: { y: '0%', transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] } },
                   }}
                 >
                   {letter === ' ' ? '\u00A0' : letter}
@@ -77,30 +71,29 @@ export default function Preloader({ onComplete }: PreloaderProps) {
 
           {/* Tagline */}
           <motion.p
-            className="font-grotesk text-sm text-white/40 tracking-[0.3em] uppercase mb-12"
+            className="font-mono text-[10px] text-white/35 tracking-[0.4em] uppercase mb-14 relative z-10"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1, transition: { delay: 0.8, duration: 0.6 } }}
+            animate={{ opacity: 1, transition: { delay: 0.8, duration: 0.7 } }}
           >
             {personal.tagline}
           </motion.p>
 
-          {/* Progress bar */}
-          <div className="w-48 h-px bg-white/10 relative overflow-hidden">
-            <motion.div
-              className="absolute inset-y-0 left-0 bg-accent"
-              style={{ width: `${progress}%` }}
-              transition={{ ease: 'linear' }}
-            />
-          </div>
-
-          {/* Counter */}
-          <motion.span
-            className="font-grotesk text-xs text-white/30 mt-3 tabular-nums"
+          {/* Progress */}
+          <motion.div
+            className="relative z-10 flex flex-col items-center gap-3"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1, transition: { delay: 0.5 } }}
           >
-            {progress}%
-          </motion.span>
+            <div className="w-40 h-px bg-white/10 relative overflow-hidden">
+              <div
+                className="absolute inset-y-0 left-0 bg-accent"
+                style={{ width: `${progress}%`, transition: 'width 40ms linear' }}
+              />
+            </div>
+            <span className="font-mono text-[10px] text-white/25 tabular-nums tracking-widest">
+              {String(progress).padStart(3, '0')}
+            </span>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>

@@ -1,7 +1,22 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(cd C:/development/ext/portfolio && npm run build 2>&1 | tail -60)",
+      "Bash(cd C:/development/ext/portfolio && npm run build 2>&1 | tail -30)",
+      "Bash(cd C:/development/ext/portfolio && npm run build 2>&1 | tail -25)",
+      "Bash(cd C:/development/ext/portfolio && npx tsc --noEmit 2>&1 | head -30)",
+      "Bash(npm run:*)",
+      "Bash(cd \"C:/development/ext/portfolio\" && npx tsc --noEmit 2>&1)",
+      "Bash(cd \"C:/development/ext/portfolio\" && rm -rf .next && npm run build 2>&1)",
+      "Bash(cd \"C:/development/ext/portfolio\" && rm -rf .next/* 2>/dev/null; npm run build 2>&1)",
+      "Bash(cd \"C:/development/ext/portfolio\" && NEXT_TELEMETRY_DISABLED=1 node_modules/.bin/next build 2>&1)",
+      "Bash(tasklist /FI \"IMAGENAME eq node.exe\" 2>&1)",
+      "Bash(taskkill //F //IM node.exe 2>&1; echo \"done\")",
+      "Bash(cd \"C:/development/ext/portfolio\" && NEXT_TELEMETRY_DISABLED=1 npm run build 2>&1)",
+      "Bash(rm -f \"C:/development/ext/portfolio/.next/trace\" 2>&1; echo \"removed\"; cd \"C:/development/ext/portfolio\" && NEXT_TELEMETRY_DISABLED=1 npm run build 2>&1)",
+      "Bash(powershell -Command \"Remove-Item -Path 'C:\\\\development\\\\ext\\\\portfolio\\\\.next' -Recurse -Force -ErrorAction SilentlyContinue; Write-Host 'Cleared'\")",
+      "Bash(taskkill //F //IM node.exe 2>&1 | head -3; echo \"killed\"; sleep 2; powershell -Command \"Remove-Item -Path 'C:\\\\development\\\\ext\\\\portfolio\\\\.next\\\\trace' -Force -ErrorAction SilentlyContinue\"; ls \"C:/development/ext/portfolio/.next/\" 2>&1)"
     ]
   }
 }
