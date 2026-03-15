@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { personal } from '@/data/personal';
@@ -17,14 +17,15 @@ const navLinks = [
 
 export default function Navigation() {
   const [scrolled, setScrolled] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
+  const progressBarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
       const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-      setScrollProgress(totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0);
+      const pct = totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0;
+      if (progressBarRef.current) progressBarRef.current.style.width = `${pct}%`;
       setScrolled(window.scrollY > 60);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -66,9 +67,10 @@ export default function Navigation() {
       >
         {/* Scroll progress line */}
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-white/[0.03]">
-          <motion.div
+          <div
+            ref={progressBarRef}
             className="h-full bg-accent/60 origin-left"
-            style={{ width: `${scrollProgress}%`, transition: 'width 80ms linear' }}
+            style={{ width: '0%', transition: 'width 80ms linear' }}
           />
         </div>
 

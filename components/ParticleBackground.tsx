@@ -33,7 +33,7 @@ export default function ParticleBackground() {
 
     const resize = () => {
       canvas.width = window.innerWidth;
-      canvas.height = document.documentElement.scrollHeight;
+      canvas.height = window.innerHeight;
     };
 
     const createParticles = () => {
@@ -60,7 +60,7 @@ export default function ParticleBackground() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const mx = mouseRef.current.x;
-      const my = mouseRef.current.y + window.scrollY; // account for scroll
+      const my = mouseRef.current.y;
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];

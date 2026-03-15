@@ -5,8 +5,9 @@ import dynamic from 'next/dynamic';
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { ArrowDown, Linkedin } from 'lucide-react';
 import { personal } from '@/data/personal';
-import { letterVariant, letterContainer } from '@/lib/animations';
+import { wordVariant, wordContainer } from '@/lib/animations';
 import MagneticButton from '@/components/ui/MagneticButton';
+import { heroPlayingRef } from '@/components/three/HeroCanvas';
 
 const HeroCanvas = dynamic(() => import('@/components/three/HeroCanvas'), {
   ssr: false,
@@ -34,6 +35,17 @@ export default function Hero() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Pause Three.js rendering when hero is off-screen
+  useEffect(() => {
+    if (!heroRef.current) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { heroPlayingRef.current = entry.isIntersecting; },
+      { threshold: 0 }
+    );
+    obs.observe(heroRef.current);
+    return () => obs.disconnect();
+  }, []);
+
   // ── Scroll progress through the hero section ──────────────────────────────
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -56,18 +68,6 @@ export default function Hero() {
   // Ambient orbs drift independently
   const orb1Y = useTransform(scrollYProgress, [0, 1], [0, -100]);
   const orb2Y = useTransform(scrollYProgress, [0, 1], [0, 70]);
-
-  const renderLetters = (text: string, className?: string) =>
-    text.split('').map((char, i) => (
-      <span key={i} className="overflow-clip inline-block">
-        <motion.span
-          className={`inline-block ${className ?? ''}`}
-          variants={shouldReduceMotion ? undefined : letterVariant}
-        >
-          {char === ' ' ? '\u00A0' : char}
-        </motion.span>
-      </span>
-    ));
 
   return (
     <section ref={heroRef} className="relative min-h-screen flex flex-col overflow-hidden" id="hero">
@@ -142,30 +142,33 @@ export default function Hero() {
             className="font-syne font-bold leading-[0.93] tracking-tight"
             initial="hidden"
             animate="visible"
-            variants={shouldReduceMotion ? { hidden: { opacity: 0 }, visible: { opacity: 1 } } : letterContainer}
+            variants={shouldReduceMotion ? { hidden: { opacity: 0 }, visible: { opacity: 1 } } : wordContainer}
           >
             {/* Line 1 — moves fastest (closest to viewer) */}
             <motion.div
-              className="flex flex-wrap text-[13vw] md:text-[10.5vw] lg:text-[9.5vw] text-white"
+              className="block text-[13vw] md:text-[10.5vw] lg:text-[9.5vw] text-white"
               style={{ y: y1, willChange: 'transform' }}
+              variants={shouldReduceMotion ? undefined : wordVariant}
             >
-              {renderLetters('Crafting')}
+              Crafting
             </motion.div>
 
             {/* Line 2 — medium speed */}
             <motion.div
-              className="flex flex-wrap text-[13vw] md:text-[10.5vw] lg:text-[9.5vw] ml-[4vw] md:ml-[7vw]"
+              className="block text-[13vw] md:text-[10.5vw] lg:text-[9.5vw] ml-[4vw] md:ml-[7vw]"
               style={{ y: y2, willChange: 'transform' }}
+              variants={shouldReduceMotion ? undefined : wordVariant}
             >
-              {renderLetters('Digital', 'text-stroke')}
+              <span className="text-stroke">Digital</span>
             </motion.div>
 
             {/* Line 3 — slowest (furthest back) */}
             <motion.div
-              className="flex flex-wrap text-[13vw] md:text-[10.5vw] lg:text-[9.5vw] text-accent ml-[1.5vw] md:ml-[2.5vw]"
+              className="block text-[13vw] md:text-[10.5vw] lg:text-[9.5vw] text-accent ml-[1.5vw] md:ml-[2.5vw]"
               style={{ y: y3, willChange: 'transform' }}
+              variants={shouldReduceMotion ? undefined : wordVariant}
             >
-              {renderLetters('Excellence.')}
+              Excellence.
             </motion.div>
           </motion.h1>
         </div>

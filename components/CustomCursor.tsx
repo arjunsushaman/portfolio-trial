@@ -12,6 +12,7 @@ interface CursorMeta {
 
 export default function CustomCursor() {
   const dotRef = useRef<HTMLDivElement>(null);
+  const currentStateRef = useRef<CursorState>('default');
   const [isTouch, setIsTouch] = useState(false);
   const [meta, setMeta] = useState<CursorMeta>({ state: 'default', label: '' });
 
@@ -47,14 +48,19 @@ export default function CustomCursor() {
       const isButton = target.tagName === 'BUTTON' || !!target.closest('button');
       const isLink = target.tagName === 'A' || !!target.closest('a');
 
+      let newState: CursorState = 'default';
+      let newLabel = '';
       if (isProjectRow) {
-        setMeta({ state: 'project', label: 'VIEW' });
+        newState = 'project'; newLabel = 'VIEW';
       } else if (isExternalLink) {
-        setMeta({ state: 'link', label: 'OPEN ↗' });
+        newState = 'link'; newLabel = 'OPEN ↗';
       } else if (isButton || isLink) {
-        setMeta({ state: 'hover', label: '' });
-      } else {
-        setMeta({ state: 'default', label: '' });
+        newState = 'hover';
+      }
+
+      if (newState !== currentStateRef.current) {
+        currentStateRef.current = newState;
+        setMeta({ state: newState, label: newLabel });
       }
     };
 

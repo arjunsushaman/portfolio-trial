@@ -1,9 +1,21 @@
 'use client';
 
 import { useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Float, MeshDistortMaterial, Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
+
+// Module-level ref so Hero.tsx can toggle rendering on/off
+export const heroPlayingRef = { current: true };
+
+// ─── Frame driver: only invalidates when hero is visible ─────────────────────
+function FrameDriver() {
+  const { invalidate } = useThree();
+  useFrame(() => {
+    if (heroPlayingRef.current) invalidate();
+  });
+  return null;
+}
 
 // ─── Animated orbiting point light ──────────────────────────────────────────
 function OrbitLight({
@@ -24,6 +36,7 @@ function OrbitLight({
   const lightRef = useRef<THREE.PointLight>(null);
 
   useFrame((state) => {
+    if (!heroPlayingRef.current) return;
     if (!lightRef.current) return;
     const t = state.clock.elapsedTime * speed;
     lightRef.current.position.set(
@@ -46,6 +59,7 @@ function OrbitingSphere({ index, total }: { index: number; total: number }) {
   );
 
   useFrame((state) => {
+    if (!heroPlayingRef.current) return;
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
     const speed = 0.28 + index * 0.13;
@@ -58,13 +72,11 @@ function OrbitingSphere({ index, total }: { index: number; total: number }) {
 
     ref.current.position.set(nx, ny, nz);
 
-    // Shift trail history
     for (let i = TRAIL - 1; i > 0; i--) {
       history.current[i].copy(history.current[i - 1]);
     }
     history.current[0].set(nx, ny, nz);
 
-    // Update trail meshes
     trailRefs.current.forEach((mesh, i) => {
       if (!mesh) return;
       mesh.position.copy(history.current[i]);
@@ -79,7 +91,6 @@ function OrbitingSphere({ index, total }: { index: number; total: number }) {
 
   return (
     <group>
-      {/* Trail meshes */}
       {Array.from({ length: TRAIL }).map((_, i) => (
         <mesh
           key={i}
@@ -98,7 +109,6 @@ function OrbitingSphere({ index, total }: { index: number; total: number }) {
         </mesh>
       ))}
 
-      {/* Main sphere */}
       <mesh ref={ref}>
         <sphereGeometry args={[0.065, 12, 12]} />
         <meshStandardMaterial
@@ -135,6 +145,7 @@ function ParticleRing({ count = 220, radius = 3.3 }: { count?: number; radius?: 
   }, [count, radius]);
 
   useFrame((state) => {
+    if (!heroPlayingRef.current) return;
     if (!ref.current) return;
     ref.current.rotation.y = state.clock.elapsedTime * 0.055;
     ref.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.1) * 0.12;
@@ -176,6 +187,7 @@ function ParticleHalo({ count = 60 }: { count?: number }) {
   }, [count]);
 
   useFrame((state) => {
+    if (!heroPlayingRef.current) return;
     if (!ref.current) return;
     ref.current.rotation.y = state.clock.elapsedTime * 0.02;
     ref.current.rotation.x = state.clock.elapsedTime * 0.015;
@@ -202,6 +214,7 @@ function TorusKnotMesh() {
   const wireRef = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
+    if (!heroPlayingRef.current) return;
     if (!meshRef.current) return;
     meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.18) * 0.5;
     meshRef.current.rotation.y = state.clock.elapsedTime * 0.09;
@@ -215,11 +228,11 @@ function TorusKnotMesh() {
     <Float speed={0.9} rotationIntensity={0.12} floatIntensity={0.4}>
       {/* Solid distorted mesh */}
       <mesh ref={meshRef}>
-        <torusKnotGeometry args={[1.5, 0.45, 100, 16, 2, 3]} />
+        <torusKnotGeometry args={[1.5, 0.45, 80, 14, 2, 3]} />
         <MeshDistortMaterial
           color="#00fff5"
-          distort={0.25}
-          speed={2}
+          distort={0.15}
+          speed={0.8}
           roughness={0.05}
           metalness={0.95}
           opacity={0.14}
@@ -249,28 +262,22 @@ function TorusKnotMesh() {
 function Scene() {
   return (
     <>
+      <FrameDriver />
       <ambientLight intensity={0.25} />
 
-      {/* Animated colored lights orbiting the scene */}
       <OrbitLight radius={4.5} speed={0.35} color="#00fff5" yAmplitude={1.5} yOffset={0.5} intensity={2} />
       <OrbitLight radius={3.5} speed={-0.28} color="#ffffff" yAmplitude={1.2} yOffset={-0.5} intensity={1.2} />
       <OrbitLight radius={5.5} speed={0.18} color="#00e5ff" yAmplitude={0.8} yOffset={0} intensity={1.5} />
 
-      {/* Main piece */}
       <TorusKnotMesh />
 
-      {/* Orbiting glowing spheres with trails */}
       <OrbitingSphere index={0} total={3} />
       <OrbitingSphere index={1} total={3} />
       <OrbitingSphere index={2} total={3} />
 
-      {/* Particle ring */}
       <ParticleRing count={100} radius={3.3} />
-
-      {/* Outer halo */}
       <ParticleHalo count={25} />
 
-      {/* Sparkles: ambient twinkling around the scene */}
       <Sparkles
         count={20}
         scale={9}
@@ -286,6 +293,7 @@ function Scene() {
 export default function HeroCanvas() {
   return (
     <Canvas
+      frameloop="demand"
       dpr={[1, 1]}
       camera={{ position: [5, 0.5, 6], fov: 42 }}
       gl={{
