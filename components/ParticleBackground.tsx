@@ -12,7 +12,7 @@ interface Particle {
   pulseOffset: number;
 }
 
-const CONNECTION_DIST = 130;
+const CONNECTION_DIST = 90;
 const MOUSE_REPEL_DIST = 100;
 const MOUSE_REPEL_FORCE = 1.2;
 const PARTICLE_DENSITY = 14000; // one particle per N px²
@@ -40,7 +40,7 @@ export default function ParticleBackground() {
       particles = [];
       const count = Math.min(
         Math.floor((canvas.width * canvas.height) / PARTICLE_DENSITY),
-        120 // cap for performance
+        55 // cap for performance
       );
       for (let i = 0; i < count; i++) {
         particles.push({

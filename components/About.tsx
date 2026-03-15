@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { motion, useInView, useScroll, useTransform, useSpring } from 'framer-motion';
+import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 import { personal } from '@/data/personal';
 import AnimatedCounter from '@/components/ui/AnimatedCounter';
 
@@ -16,32 +16,36 @@ export default function About() {
   });
 
   // Quote mark drifts upward faster than the page scroll — creates depth
-  const rawQuoteY = useTransform(scrollYProgress, [0, 1], [60, -100]);
-  const quoteY = useSpring(rawQuoteY, { stiffness: 60, damping: 18 });
+  const quoteY = useTransform(scrollYProgress, [0, 1], [60, -100]);
 
   // Bio text has a very slight parallax
-  const rawBioY = useTransform(scrollYProgress, [0, 1], [20, -30]);
-  const bioY = useSpring(rawBioY, { stiffness: 60, damping: 18 });
+  const bioY = useTransform(scrollYProgress, [0, 1], [20, -30]);
 
   // Stats column moves slightly slower than the bio
-  const rawStatsY = useTransform(scrollYProgress, [0, 1], [40, -20]);
-  const statsY = useSpring(rawStatsY, { stiffness: 60, damping: 18 });
+  const statsY = useTransform(scrollYProgress, [0, 1], [40, -20]);
 
   // Ambient orbs float at different rates
   const orb1Y = useTransform(scrollYProgress, [0, 1], [-30, 60]);
   const orb2Y = useTransform(scrollYProgress, [0, 1], [40, -50]);
 
-  // 3D perspective tilt on stat cards
+  // 3D perspective tilt on stat cards — RAF-throttled
+  const tiltRaf = useRef<number | null>(null);
   const handleTilt = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (tiltRaf.current) return;
     const el = e.currentTarget;
-    const rect = el.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 10;
-    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -10;
-    el.style.transform = `perspective(700px) rotateX(${y}deg) rotateY(${x}deg) scale(1.03)`;
-    el.style.transition = 'transform 0.1s ease-out';
+    const cx = e.clientX, cy = e.clientY;
+    tiltRaf.current = requestAnimationFrame(() => {
+      tiltRaf.current = null;
+      const rect = el.getBoundingClientRect();
+      const x = ((cx - rect.left) / rect.width - 0.5) * 10;
+      const y = ((cy - rect.top) / rect.height - 0.5) * -10;
+      el.style.transform = `perspective(700px) rotateX(${y}deg) rotateY(${x}deg) scale(1.03)`;
+      el.style.transition = 'transform 0.1s ease-out';
+    });
   };
 
   const resetTilt = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (tiltRaf.current) { cancelAnimationFrame(tiltRaf.current); tiltRaf.current = null; }
     e.currentTarget.style.transform = '';
     e.currentTarget.style.transition = 'transform 0.4s ease-out';
   };

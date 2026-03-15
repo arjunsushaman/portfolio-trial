@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { motion, useReducedMotion, useScroll, useTransform, useSpring } from 'framer-motion';
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { ArrowDown, Linkedin } from 'lucide-react';
 import { personal } from '@/data/personal';
 import { letterVariant, letterContainer } from '@/lib/animations';
@@ -41,12 +41,9 @@ export default function Hero() {
   });
 
   // Multi-layer headline parallax — each line moves at a different rate
-  const rawY1 = useTransform(scrollYProgress, [0, 1], [0, -180]); // front / fastest
-  const rawY2 = useTransform(scrollYProgress, [0, 1], [0, -120]); // middle
-  const rawY3 = useTransform(scrollYProgress, [0, 1], [0, -70]);  // back / slowest
-  const y1 = useSpring(rawY1, { stiffness: 80, damping: 20 });
-  const y2 = useSpring(rawY2, { stiffness: 80, damping: 20 });
-  const y3 = useSpring(rawY3, { stiffness: 80, damping: 20 });
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -180]); // front / fastest
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, -120]); // middle
+  const y3 = useTransform(scrollYProgress, [0, 1], [0, -70]);  // back / slowest
 
   // Sub-content fades and rises as you scroll
   const subOpacity = useTransform(scrollYProgress, [0, 0.45], [1, 0]);

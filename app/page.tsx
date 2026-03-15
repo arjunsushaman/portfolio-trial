@@ -16,7 +16,6 @@ import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import GlowDivider from '@/components/ui/GlowDivider';
 import SectionCounter from '@/components/ui/SectionCounter';
-import ScrollSkew from '@/components/ui/ScrollSkew';
 
 // Lazy-load the particle background so it doesn't block initial paint
 const ParticleBackground = dynamic(
@@ -45,24 +44,22 @@ export default function Home() {
         <>
           <Navigation />
           <SectionCounter />
-          <ScrollSkew>
-            <main>
-              <Hero />
-              <GlowDivider />
-              <About />
-              <GlowDivider />
-              <Skills />
-              <GlowDivider />
-              <Projects />
-              <GlowDivider />
-              <Process />
-              <GlowDivider />
-              <Testimonials />
-              <GlowDivider />
-              <Contact />
-            </main>
-            <Footer />
-          </ScrollSkew>
+          <main>
+            <Hero />
+            <GlowDivider />
+            <About />
+            <GlowDivider />
+            <Skills />
+            <GlowDivider />
+            <Projects />
+            <GlowDivider />
+            <Process />
+            <GlowDivider />
+            <Testimonials />
+            <GlowDivider />
+            <Contact />
+          </main>
+          <Footer />
         </>
       )}
     </SmoothScrollProvider>

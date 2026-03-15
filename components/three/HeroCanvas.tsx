@@ -40,7 +40,7 @@ function OrbitLight({
 function OrbitingSphere({ index, total }: { index: number; total: number }) {
   const ref = useRef<THREE.Mesh>(null);
   const trailRefs = useRef<THREE.Mesh[]>([]);
-  const TRAIL = 6;
+  const TRAIL = 3;
   const history = useRef<THREE.Vector3[]>(
     Array.from({ length: TRAIL }, () => new THREE.Vector3())
   );
@@ -200,7 +200,6 @@ function ParticleHalo({ count = 60 }: { count?: number }) {
 function TorusKnotMesh() {
   const meshRef = useRef<THREE.Mesh>(null);
   const wireRef = useRef<THREE.Mesh>(null);
-  const innerRef = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
     if (!meshRef.current) return;
@@ -210,17 +209,13 @@ function TorusKnotMesh() {
       wireRef.current.rotation.x = meshRef.current.rotation.x;
       wireRef.current.rotation.y = meshRef.current.rotation.y;
     }
-    if (innerRef.current) {
-      innerRef.current.rotation.x = -meshRef.current.rotation.x * 0.5;
-      innerRef.current.rotation.y = -meshRef.current.rotation.y * 0.5;
-    }
   });
 
   return (
     <Float speed={0.9} rotationIntensity={0.12} floatIntensity={0.4}>
       {/* Solid distorted mesh */}
       <mesh ref={meshRef}>
-        <torusKnotGeometry args={[1.5, 0.45, 200, 20, 2, 3]} />
+        <torusKnotGeometry args={[1.5, 0.45, 100, 16, 2, 3]} />
         <MeshDistortMaterial
           color="#00fff5"
           distort={0.25}
@@ -236,25 +231,12 @@ function TorusKnotMesh() {
 
       {/* Outer wireframe */}
       <mesh ref={wireRef}>
-        <torusKnotGeometry args={[1.54, 0.47, 180, 20, 2, 3]} />
+        <torusKnotGeometry args={[1.54, 0.47, 90, 16, 2, 3]} />
         <meshBasicMaterial
           color="#00fff5"
           wireframe
           transparent
           opacity={0.055}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-        />
-      </mesh>
-
-      {/* Inner counter-rotating wireframe */}
-      <mesh ref={innerRef}>
-        <torusKnotGeometry args={[1.46, 0.42, 120, 16, 2, 3]} />
-        <meshBasicMaterial
-          color="#40ffff"
-          wireframe
-          transparent
-          opacity={0.03}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
@@ -283,14 +265,14 @@ function Scene() {
       <OrbitingSphere index={2} total={3} />
 
       {/* Particle ring */}
-      <ParticleRing count={220} radius={3.3} />
+      <ParticleRing count={100} radius={3.3} />
 
       {/* Outer halo */}
-      <ParticleHalo count={60} />
+      <ParticleHalo count={25} />
 
       {/* Sparkles: ambient twinkling around the scene */}
       <Sparkles
-        count={50}
+        count={20}
         scale={9}
         size={1.8}
         speed={0.25}
@@ -304,7 +286,7 @@ function Scene() {
 export default function HeroCanvas() {
   return (
     <Canvas
-      dpr={[1, 1.5]}
+      dpr={[1, 1]}
       camera={{ position: [5, 0.5, 6], fov: 42 }}
       gl={{
         antialias: true,
