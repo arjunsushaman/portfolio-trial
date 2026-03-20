@@ -5,10 +5,9 @@ import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { Github, Linkedin, Twitter, ArrowUpRight, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { personal } from '@/data/personal';
 import { letterVariant, letterContainer } from '@/lib/animations';
+import BudgetSelect from '@/components/BudgetSelect';
 
 type FormState = 'idle' | 'loading' | 'success' | 'error';
-
-const budgetOptions = ['< $5k', '$5k – $15k', '$15k – $30k', '$30k+'];
 
 const socialDefs = [
   { label: 'GitHub', icon: 'github', Icon: Github },
@@ -60,11 +59,10 @@ function Field({
       {/* Floating label */}
       <label
         htmlFor={name}
-        className={`absolute left-4 pointer-events-none font-mono uppercase tracking-[0.18em] transition-all duration-200 ${
-          lifted
-            ? 'top-2 text-[8px] ' + (focused ? 'text-accent/70' : 'text-white/30')
-            : 'top-1/2 -translate-y-1/2 text-[10px] text-white/25'
-        }`}
+        className={`absolute left-4 pointer-events-none font-mono uppercase tracking-[0.18em] transition-all duration-200 ${lifted
+          ? 'top-2 text-[8px] ' + (focused ? 'text-accent/70' : 'text-white/30')
+          : 'top-1/2 -translate-y-1/2 text-[10px] text-white/25'
+          }`}
       >
         {label}
       </label>
@@ -111,19 +109,17 @@ function MessageField({
       />
       <label
         htmlFor="message"
-        className={`absolute left-4 pointer-events-none font-mono uppercase tracking-[0.18em] transition-all duration-200 ${
-          lifted
-            ? 'top-2 text-[8px] ' + (focused ? 'text-accent/70' : 'text-white/30')
-            : 'top-4 text-[10px] text-white/25'
-        }`}
+        className={`absolute left-4 pointer-events-none font-mono uppercase tracking-[0.18em] transition-all duration-200 ${lifted
+          ? 'top-2 text-[8px] ' + (focused ? 'text-accent/70' : 'text-white/30')
+          : 'top-4 text-[10px] text-white/25'
+          }`}
       >
         Message
       </label>
       {/* Char count — bottom right of textarea */}
       <span
-        className={`absolute bottom-3 right-4 font-mono text-[8px] tabular-nums pointer-events-none transition-colors duration-200 ${
-          focused ? 'text-white/25' : 'text-white/10'
-        }`}
+        className={`absolute bottom-3 right-4 font-mono text-[8px] tabular-nums pointer-events-none transition-colors duration-200 ${focused ? 'text-white/25' : 'text-white/10'
+          }`}
       >
         {value.length}/{MAX}
       </span>
@@ -201,9 +197,8 @@ export default function Contact() {
                     {word.split('').map((char, ci) => (
                       <span key={ci} className="overflow-clip inline-block">
                         <motion.span
-                          className={`inline-block text-[10vw] md:text-[7vw] lg:text-[5.5vw] ${
-                            wi === 3 ? 'text-gradient' : 'text-white'
-                          }`}
+                          className={`inline-block text-[10vw] md:text-[7vw] lg:text-[5.5vw] ${wi === 3 ? 'text-gradient' : 'text-white'
+                            }`}
                           variants={letterVariant}
                         >
                           {char}
@@ -380,31 +375,10 @@ export default function Contact() {
                   </div>
 
                   {/* Budget */}
-                  <div>
-                    <p className="font-mono text-[9px] text-white/25 tracking-[0.2em] uppercase mb-2.5 px-0.5">
-                      Project Budget
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {budgetOptions.map((opt) => (
-                        <button
-                          key={opt}
-                          type="button"
-                          onClick={() =>
-                            setFormData((d) => ({ ...d, budget: d.budget === opt ? '' : opt }))
-                          }
-                          className="relative font-mono text-[10px] px-4 py-2 rounded-lg transition-all duration-200"
-                          style={{
-                            border: `1px solid ${formData.budget === opt ? 'rgba(0,255,245,0.45)' : 'rgba(255,255,255,0.07)'}`,
-                            background: formData.budget === opt ? 'rgba(0,255,245,0.08)' : 'rgba(255,255,255,0.02)',
-                            color: formData.budget === opt ? 'rgba(0,255,245,0.9)' : 'rgba(255,255,255,0.3)',
-                            boxShadow: formData.budget === opt ? '0 0 12px rgba(0,255,245,0.08)' : 'none',
-                          }}
-                        >
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  <BudgetSelect
+                    value={formData.budget}
+                    onChange={(val) => setFormData((d) => ({ ...d, budget: val }))}
+                  />
 
                   {/* Message */}
                   <MessageField value={formData.message} onChange={handleChange} />

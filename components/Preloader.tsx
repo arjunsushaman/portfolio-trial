@@ -44,9 +44,9 @@ export default function Preloader({ onComplete }: PreloaderProps) {
           </div>
 
           {/* Letter-by-letter name reveal */}
-          <div className="overflow-hidden mb-3 relative z-10">
+          <div className="overflow-hidden mb-3 relative z-10 px-4 md:px-0">
             <motion.div
-              className="flex gap-[2px]"
+              className="flex flex-wrap justify-center gap-[2px] md:flex-nowrap"
               initial="hidden"
               animate="visible"
               variants={{
@@ -57,7 +57,7 @@ export default function Preloader({ onComplete }: PreloaderProps) {
               {letters.map((letter, i) => (
                 <motion.span
                   key={i}
-                  className="font-syne text-5xl md:text-7xl font-bold tracking-tight text-white"
+                  className="font-syne text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white"
                   variants={{
                     hidden: { y: '110%' },
                     visible: { y: '0%', transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] } },

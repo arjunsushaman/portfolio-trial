@@ -19,10 +19,10 @@ export const skillCategories: SkillCategory[] = [
     icon: 'monitor',
     skills: [
       { name: 'React / Next.js', level: 98 },
-      { name: 'TypeScript', level: 95 },
+      { name: 'JavaScript, TypeScript', level: 95 },
       { name: 'Tailwind CSS', level: 97 },
       { name: 'Framer Motion', level: 90 },
-      { name: 'Vue / Nuxt', level: 80 },
+      { name: 'Vue / Angular', level: 80 },
       { name: 'Three.js / WebGL', level: 75 },
     ],
   },
@@ -33,9 +33,10 @@ export const skillCategories: SkillCategory[] = [
     icon: 'shopping-cart',
     skills: [
       { name: 'Shopify / Hydrogen', level: 92 },
-      { name: 'WordPress / ACF', level: 90 },
+      { name: 'WordPress / Elementor', level: 90 },
       { name: 'Contentful', level: 85 },
       { name: 'Sanity.io', level: 88 },
+      { name: 'Strapi', level: 90 },
       { name: 'Stripe Integration', level: 85 },
       { name: 'WooCommerce', level: 80 },
     ],
@@ -52,6 +53,8 @@ export const skillCategories: SkillCategory[] = [
       { name: 'GraphQL / REST', level: 88 },
       { name: 'Testing (Jest/Vitest)', level: 82 },
       { name: 'CI/CD Pipelines', level: 80 },
+      { name: 'Docker', level: 80 },
+      { name: 'Vibe Coding', level: 99 }
     ],
   },
 ];

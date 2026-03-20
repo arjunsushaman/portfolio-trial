@@ -15,7 +15,7 @@ const steps = [
     tagline: 'Understanding the why.',
     description:
       'Deep-dive into your goals, users, and competitive landscape. We align on scope, success metrics, and technical constraints before a single line of code is written.',
-    duration: '1–2 weeks',
+    duration: 'Week 1',
     icon: Search,
     deliverables: [
       'User research summary',
@@ -31,7 +31,7 @@ const steps = [
     tagline: 'Making it pixel-perfect.',
     description:
       'High-fidelity Figma prototypes, design tokens, and component specs. I translate your brand vision into a system ready for engineering — with every state, edge case, and interaction defined.',
-    duration: '2–3 weeks',
+    duration: 'Week 2',
     icon: Pencil,
     deliverables: [
       'Interactive Figma prototype',
@@ -47,11 +47,10 @@ const steps = [
     tagline: 'Engineering with precision.',
     description:
       'Iterative development with weekly demos on a private staging environment. Clean, typed code with full test coverage. Performance-first architecture that scales as your business does.',
-    duration: '4–8 weeks',
+    duration: 'Week 3',
     icon: Code2,
     deliverables: [
       'Weekly Loom walkthroughs',
-      'Private staging environment',
       'Documented GitHub PRs',
       'Full TypeScript + tests',
     ],
@@ -63,7 +62,7 @@ const steps = [
     tagline: 'Ship with confidence.',
     description:
       'Zero-downtime deployment, SEO audit, Core Web Vitals check, and a 30-day post-launch support window. Your product goes live knowing every detail has been verified.',
-    duration: '1 week + 30-day support',
+    duration: 'Week 4',
     icon: Rocket,
     deliverables: [
       'Lighthouse performance report',

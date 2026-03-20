@@ -13,8 +13,8 @@ export const personal = {
   formspreeEndpoint: 'https://formspree.io/f/YOUR_FORM_ID', // Replace with your Formspree form ID
   stats: [
     { value: 5, suffix: '+', label: 'Years Experience' },
-    { value: 80, suffix: '+', label: 'Projects Delivered' },
-    { value: 60, suffix: '+', label: 'Happy Clients' },
+    { value: 30, suffix: '+', label: 'Projects Delivered' },
+    { value: 15, suffix: '+', label: 'Happy Clients' },
     { value: 15, suffix: '+', label: 'Technologies' },
   ],
   socials: [

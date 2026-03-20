@@ -10,29 +10,29 @@ export interface Testimonial {
 export const testimonials: Testimonial[] = [
   {
     id: 'test-1',
-    name: 'Sarah Chen',
-    role: 'Head of Product',
-    company: 'Vanta Inc.',
+    name: 'Naveen',
+    role: 'Freelancer',
+    company: 'Upwork',
     quote:
-      "Sushaman transformed our clunky internal tool into a dashboard our team actually loves using. The attention to micro-interactions and performance was exceptional — we went from dreading Monday reports to looking forward to them. Highly recommend for any serious SaaS project.",
-    avatar: 'https://picsum.photos/seed/avatar-1/80/80',
-  },
-  {
-    id: 'test-2',
-    name: 'Marcus Webb',
-    role: 'Founder & CEO',
-    company: 'Ember Supply Co.',
-    quote:
-      "We hired Sushaman to rebuild our Shopify storefront and the results exceeded every expectation. Revenue is up 40%, the site feels premium, and load times are incredible. Sushaman doesn't just write code — they think deeply about business outcomes. A genuine partner, not just a freelancer.",
+      "We hired Arjun Sushaman to build a custom Shopify template with seamless Stripe integration. The final product is exactly what we needed to showcase high-quality ecommerce demos to our clients. Professional, efficient, and highly recommended",
     avatar: 'https://picsum.photos/seed/avatar-2/80/80',
   },
   {
-    id: 'test-3',
-    name: 'Priya Nair',
-    role: 'Digital Director',
-    company: 'Meridian Media',
+    id: 'test-2',
+    name: 'Sethulekshmi S M',
+    role: 'Psychologist s',
+    company: 'Lead By Sethulekshmi',
     quote:
-      "I've worked with a lot of developers over my career. Sushaman stands apart because of how they communicate, how they problem-solve under pressure, and how much they care about the finished product. Our site now handles double the traffic with zero downtime. They're worth every penny.",
+      "I needed something simple, reliable, and quick, and Sushaman delivered exactly that. He built a smooth, user-friendly web app with an efficient appointment and scheduling system in no time. Even after completion, he was incredibly responsive to last-minute changes and updates. Truly dependable and great to work with.",
+    avatar: 'https://www.leadbysethulekshmi.com/logo.png',
+  },
+  {
+    id: 'test-3',
+    name: 'Mahesh',
+    role: 'Freelancer',
+    company: 'Digital Support',
+    quote:
+      "Sushaman was instrumental in turning our initial concept into a high-fidelity prototype. He built a fully functional service marketplace MVP tailored exactly to our requirements, giving us the professional edge we needed to pitch to investors with confidence",
     avatar: 'https://picsum.photos/seed/avatar-3/80/80',
   },
 ];
