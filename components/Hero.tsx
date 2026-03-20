@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
 import { ArrowDown, Linkedin } from 'lucide-react';
 import { personal } from '@/data/personal';
 import { wordVariant, wordContainer } from '@/lib/animations';
@@ -52,31 +52,40 @@ export default function Hero() {
     offset: ['start start', 'end start'],
   });
 
+  // Spring-smooth scroll value — gives a natural damped feel to all parallax
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 60,
+    damping: 20,
+    restDelta: 0.001,
+  });
+
   // Multi-layer headline parallax — each line moves at a different rate
-  const y1 = useTransform(scrollYProgress, [0, 1], [0, -180]); // front / fastest
-  const y2 = useTransform(scrollYProgress, [0, 1], [0, -120]); // middle
-  const y3 = useTransform(scrollYProgress, [0, 1], [0, -70]);  // back / slowest
+  // Wider range + spring = natural depth illusion
+  const y1 = useTransform(smoothProgress, [0, 1], [0, -220]); // front / fastest
+  const y2 = useTransform(smoothProgress, [0, 1], [0, -145]); // middle
+  const y3 = useTransform(smoothProgress, [0, 1], [0, -80]);  // back / slowest
 
-  // Sub-content fades and rises as you scroll
-  const subOpacity = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
-  const subY = useTransform(scrollYProgress, [0, 1], [0, -90]);
+  // Sub-content fades and rises as you scroll — wider window = smoother dissolve
+  const subOpacity = useTransform(smoothProgress, [0, 0.55], [1, 0]);
+  const subY = useTransform(smoothProgress, [0, 1], [0, -100]);
 
-  // 3D canvas fades + gently scales as you scroll past hero
-  const canvasOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
-  const canvasScale  = useTransform(scrollYProgress, [0, 1], [1, 1.12]);
+  // 3D canvas fades + gently scales + translates upward on scroll
+  const canvasOpacity = useTransform(smoothProgress, [0, 0.8], [1, 0]);
+  const canvasScale   = useTransform(smoothProgress, [0, 1], [1, 1.1]);
+  const canvasY       = useTransform(smoothProgress, [0, 1], [0, -60]);
 
-  // Ambient orbs drift independently
-  const orb1Y = useTransform(scrollYProgress, [0, 1], [0, -100]);
-  const orb2Y = useTransform(scrollYProgress, [0, 1], [0, 70]);
+  // Ambient orbs drift independently — counter-direction for depth
+  const orb1Y = useTransform(smoothProgress, [0, 1], [0, -130]);
+  const orb2Y = useTransform(smoothProgress, [0, 1], [0, 90]);
 
   return (
     <section ref={heroRef} className="relative min-h-screen flex flex-col overflow-hidden" id="hero">
 
-      {/* ── Three.js canvas — fades + scales on scroll ── */}
+      {/* ── Three.js canvas — fades + scales + lifts on scroll ── */}
       {mounted && !isMobile && (
         <motion.div
           className="absolute inset-0 pointer-events-none"
-          style={{ opacity: canvasOpacity, scale: canvasScale }}
+          style={{ opacity: canvasOpacity, scale: canvasScale, y: canvasY }}
         >
           <HeroCanvas />
         </motion.div>

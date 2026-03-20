@@ -17,6 +17,26 @@ function FrameDriver() {
   return null;
 }
 
+// ─── Scene Wrapper with smooth mouse parallax ────────────────────────────────
+// The whole scene gently tilts toward the mouse cursor using lerp
+function SceneWrapper({ children }: { children: React.ReactNode }) {
+  const groupRef = useRef<THREE.Group>(null);
+
+  useFrame((state) => {
+    if (!heroPlayingRef.current || !groupRef.current) return;
+
+    // Mouse pointer is in [-1, 1] range already in R3F
+    const targetX = state.pointer.y * 0.18 + Math.sin(state.clock.elapsedTime * 0.25) * 0.04;
+    const targetY = state.pointer.x * 0.22 + Math.cos(state.clock.elapsedTime * 0.18) * 0.04;
+
+    // Ease factor of 0.035 gives a buttery ~28-frame lag
+    groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, targetX, 0.035);
+    groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, targetY, 0.035);
+  });
+
+  return <group ref={groupRef}>{children}</group>;
+}
+
 // ─── Animated orbiting point light ──────────────────────────────────────────
 function OrbitLight({
   radius,
@@ -36,38 +56,36 @@ function OrbitLight({
   const lightRef = useRef<THREE.PointLight>(null);
 
   useFrame((state) => {
-    if (!heroPlayingRef.current) return;
-    if (!lightRef.current) return;
+    if (!heroPlayingRef.current || !lightRef.current) return;
     const t = state.clock.elapsedTime * speed;
     lightRef.current.position.set(
       Math.cos(t) * radius,
       Math.sin(t * 0.55) * yAmplitude + yOffset,
-      Math.sin(t) * radius
+      Math.sin(t) * radius,
     );
   });
 
-  return <pointLight ref={lightRef} color={color} intensity={intensity} distance={9} decay={2} />;
+  return <pointLight ref={lightRef} color={color} intensity={intensity} distance={10} decay={2} />;
 }
 
-// ─── Tiny glowing orbiting sphere ───────────────────────────────────────────
+// ─── Tiny glowing orbiting sphere with motion trail ─────────────────────────
 function OrbitingSphere({ index, total }: { index: number; total: number }) {
   const ref = useRef<THREE.Mesh>(null);
   const trailRefs = useRef<THREE.Mesh[]>([]);
-  const TRAIL = 3;
+  const TRAIL = 4;
   const history = useRef<THREE.Vector3[]>(
-    Array.from({ length: TRAIL }, () => new THREE.Vector3())
+    Array.from({ length: TRAIL }, () => new THREE.Vector3()),
   );
 
   useFrame((state) => {
-    if (!heroPlayingRef.current) return;
-    if (!ref.current) return;
+    if (!heroPlayingRef.current || !ref.current) return;
     const t = state.clock.elapsedTime;
-    const speed = 0.28 + index * 0.13;
+    const speed = 0.26 + index * 0.11;
     const angle = t * speed + (index * Math.PI * 2) / total;
-    const r = 2.7 + index * 0.4;
+    const r = 2.6 + index * 0.45;
 
     const nx = Math.cos(angle) * r;
-    const ny = Math.sin(angle * 0.65) * 1.8;
+    const ny = Math.sin(angle * 0.62) * 1.7;
     const nz = Math.sin(angle) * r;
 
     ref.current.position.set(nx, ny, nz);
@@ -80,9 +98,9 @@ function OrbitingSphere({ index, total }: { index: number; total: number }) {
     trailRefs.current.forEach((mesh, i) => {
       if (!mesh) return;
       mesh.position.copy(history.current[i]);
-      const scale = 1 - i / TRAIL;
-      mesh.scale.setScalar(scale * 0.6);
-      (mesh.material as THREE.MeshStandardMaterial).opacity = scale * 0.35;
+      const s = 1 - i / TRAIL;
+      mesh.scale.setScalar(s * 0.65);
+      (mesh.material as THREE.MeshStandardMaterial).opacity = s * 0.3;
     });
   });
 
@@ -92,10 +110,7 @@ function OrbitingSphere({ index, total }: { index: number; total: number }) {
   return (
     <group>
       {Array.from({ length: TRAIL }).map((_, i) => (
-        <mesh
-          key={i}
-          ref={(el) => { if (el) trailRefs.current[i] = el; }}
-        >
+        <mesh key={i} ref={(el) => { if (el) trailRefs.current[i] = el; }}>
           <sphereGeometry args={[0.055, 8, 8]} />
           <meshStandardMaterial
             color={color}
@@ -110,13 +125,13 @@ function OrbitingSphere({ index, total }: { index: number; total: number }) {
       ))}
 
       <mesh ref={ref}>
-        <sphereGeometry args={[0.065, 12, 12]} />
+        <sphereGeometry args={[0.068, 14, 14]} />
         <meshStandardMaterial
           color={color}
           emissive={color}
-          emissiveIntensity={4}
+          emissiveIntensity={5}
           transparent
-          opacity={0.9}
+          opacity={0.92}
           depthWrite={false}
           blending={THREE.AdditiveBlending}
         />
@@ -126,15 +141,15 @@ function OrbitingSphere({ index, total }: { index: number; total: number }) {
 }
 
 // ─── Particle ring orbiting the torus knot ──────────────────────────────────
-function ParticleRing({ count = 220, radius = 3.3 }: { count?: number; radius?: number }) {
+function ParticleRing({ count = 200, radius = 3.3 }: { count?: number; radius?: number }) {
   const ref = useRef<THREE.Points>(null);
 
   const geometry = useMemo(() => {
     const positions = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
       const angle = (i / count) * Math.PI * 2;
-      const r = radius + (Math.random() - 0.5) * 0.7;
-      const y = (Math.random() - 0.5) * 1.1;
+      const r = radius + (Math.random() - 0.5) * 0.8;
+      const y = (Math.random() - 0.5) * 1.2;
       positions[i * 3] = Math.cos(angle) * r;
       positions[i * 3 + 1] = y;
       positions[i * 3 + 2] = Math.sin(angle) * r;
@@ -145,20 +160,19 @@ function ParticleRing({ count = 220, radius = 3.3 }: { count?: number; radius?: 
   }, [count, radius]);
 
   useFrame((state) => {
-    if (!heroPlayingRef.current) return;
-    if (!ref.current) return;
-    ref.current.rotation.y = state.clock.elapsedTime * 0.055;
-    ref.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.1) * 0.12;
-    ref.current.rotation.z = Math.cos(state.clock.elapsedTime * 0.08) * 0.05;
+    if (!heroPlayingRef.current || !ref.current) return;
+    ref.current.rotation.y = state.clock.elapsedTime * 0.05;
+    ref.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.09) * 0.11;
+    ref.current.rotation.z = Math.cos(state.clock.elapsedTime * 0.07) * 0.045;
   });
 
   return (
     <points ref={ref} geometry={geometry}>
       <pointsMaterial
         color="#00fff5"
-        size={0.028}
+        size={0.03}
         transparent
-        opacity={0.7}
+        opacity={0.65}
         sizeAttenuation
         blending={THREE.AdditiveBlending}
         depthWrite={false}
@@ -168,7 +182,7 @@ function ParticleRing({ count = 220, radius = 3.3 }: { count?: number; radius?: 
 }
 
 // ─── Outer diffuse particle halo ────────────────────────────────────────────
-function ParticleHalo({ count = 60 }: { count?: number }) {
+function ParticleHalo({ count = 70 }: { count?: number }) {
   const ref = useRef<THREE.Points>(null);
 
   const geometry = useMemo(() => {
@@ -176,7 +190,7 @@ function ParticleHalo({ count = 60 }: { count?: number }) {
     for (let i = 0; i < count; i++) {
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
-      const r = 5 + Math.random() * 2.5;
+      const r = 5 + Math.random() * 2.8;
       positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
       positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
       positions[i * 3 + 2] = r * Math.cos(phi);
@@ -187,19 +201,18 @@ function ParticleHalo({ count = 60 }: { count?: number }) {
   }, [count]);
 
   useFrame((state) => {
-    if (!heroPlayingRef.current) return;
-    if (!ref.current) return;
-    ref.current.rotation.y = state.clock.elapsedTime * 0.02;
-    ref.current.rotation.x = state.clock.elapsedTime * 0.015;
+    if (!heroPlayingRef.current || !ref.current) return;
+    ref.current.rotation.y = state.clock.elapsedTime * 0.018;
+    ref.current.rotation.x = state.clock.elapsedTime * 0.012;
   });
 
   return (
     <points ref={ref} geometry={geometry}>
       <pointsMaterial
         color="#00fff5"
-        size={0.018}
+        size={0.02}
         transparent
-        opacity={0.35}
+        opacity={0.3}
         sizeAttenuation
         blending={THREE.AdditiveBlending}
         depthWrite={false}
@@ -209,15 +222,17 @@ function ParticleHalo({ count = 60 }: { count?: number }) {
 }
 
 // ─── Main torus knot ────────────────────────────────────────────────────────
+// Rotation is driven purely by time — no per-frame mesh duplication.
+// Smoother segment counts (128/20) give cleaner edges.
 function TorusKnotMesh() {
   const meshRef = useRef<THREE.Mesh>(null);
   const wireRef = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
-    if (!heroPlayingRef.current) return;
-    if (!meshRef.current) return;
-    meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.18) * 0.5;
-    meshRef.current.rotation.y = state.clock.elapsedTime * 0.09;
+    if (!heroPlayingRef.current || !meshRef.current) return;
+    const t = state.clock.elapsedTime;
+    meshRef.current.rotation.x = Math.sin(t * 0.16) * 0.45;
+    meshRef.current.rotation.y = t * 0.08;
     if (wireRef.current) {
       wireRef.current.rotation.x = meshRef.current.rotation.x;
       wireRef.current.rotation.y = meshRef.current.rotation.y;
@@ -225,31 +240,31 @@ function TorusKnotMesh() {
   });
 
   return (
-    <Float speed={0.9} rotationIntensity={0.12} floatIntensity={0.4}>
+    <Float speed={0.8} rotationIntensity={0.1} floatIntensity={0.45}>
       {/* Solid distorted mesh */}
       <mesh ref={meshRef}>
-        <torusKnotGeometry args={[1.5, 0.45, 80, 14, 2, 3]} />
+        <torusKnotGeometry args={[1.5, 0.44, 128, 18, 2, 3]} />
         <MeshDistortMaterial
           color="#00fff5"
-          distort={0.15}
-          speed={0.8}
-          roughness={0.05}
-          metalness={0.95}
-          opacity={0.14}
+          distort={0.12}
+          speed={0.7}
+          roughness={0.04}
+          metalness={0.97}
+          opacity={0.16}
           transparent
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
       </mesh>
 
-      {/* Outer wireframe */}
+      {/* Outer wireframe — slightly bigger so it halos the solid */}
       <mesh ref={wireRef}>
-        <torusKnotGeometry args={[1.54, 0.47, 90, 16, 2, 3]} />
+        <torusKnotGeometry args={[1.55, 0.46, 100, 18, 2, 3]} />
         <meshBasicMaterial
           color="#00fff5"
           wireframe
           transparent
-          opacity={0.055}
+          opacity={0.045}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
@@ -258,16 +273,16 @@ function TorusKnotMesh() {
   );
 }
 
-// ─── Scene ──────────────────────────────────────────────────────────────────
+// ─── Scene ───────────────────────────────────────────────────────────────────
 function Scene() {
   return (
-    <>
+    <SceneWrapper>
       <FrameDriver />
-      <ambientLight intensity={0.25} />
+      <ambientLight intensity={0.22} />
 
-      <OrbitLight radius={4.5} speed={0.35} color="#00fff5" yAmplitude={1.5} yOffset={0.5} intensity={2} />
-      <OrbitLight radius={3.5} speed={-0.28} color="#ffffff" yAmplitude={1.2} yOffset={-0.5} intensity={1.2} />
-      <OrbitLight radius={5.5} speed={0.18} color="#00e5ff" yAmplitude={0.8} yOffset={0} intensity={1.5} />
+      <OrbitLight radius={4.5} speed={0.32}  color="#00fff5" yAmplitude={1.5} yOffset={0.5}  intensity={2.2} />
+      <OrbitLight radius={3.4} speed={-0.25} color="#ffffff" yAmplitude={1.2} yOffset={-0.5} intensity={1.1} />
+      <OrbitLight radius={5.8} speed={0.17}  color="#00e5ff" yAmplitude={0.8} yOffset={0}    intensity={1.4} />
 
       <TorusKnotMesh />
 
@@ -275,26 +290,27 @@ function Scene() {
       <OrbitingSphere index={1} total={3} />
       <OrbitingSphere index={2} total={3} />
 
-      <ParticleRing count={100} radius={3.3} />
-      <ParticleHalo count={25} />
+      <ParticleRing count={180} radius={3.3} />
+      <ParticleHalo count={50} />
 
       <Sparkles
-        count={20}
-        scale={9}
-        size={1.8}
-        speed={0.25}
-        opacity={0.45}
+        count={24}
+        scale={10}
+        size={2}
+        speed={0.2}
+        opacity={0.4}
         color="#00fff5"
       />
-    </>
+    </SceneWrapper>
   );
 }
 
+// ─── Canvas ───────────────────────────────────────────────────────────────────
 export default function HeroCanvas() {
   return (
     <Canvas
       frameloop="demand"
-      dpr={[1, 1]}
+      dpr={[1, 1.5]}
       camera={{ position: [5, 0.5, 6], fov: 42 }}
       gl={{
         antialias: true,
