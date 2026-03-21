@@ -6,6 +6,7 @@ import { Github, Linkedin, Twitter, ArrowUpRight, CheckCircle, AlertCircle, Load
 import { personal } from '@/data/personal';
 import { letterVariant, letterContainer } from '@/lib/animations';
 import BudgetSelect from '@/components/BudgetSelect';
+import emailjs from '@emailjs/browser';
 
 type FormState = 'idle' | 'loading' | 'success' | 'error';
 
@@ -141,12 +142,21 @@ export default function Contact() {
     e.preventDefault();
     setFormState('loading');
     try {
-      const res = await fetch(personal.formspreeEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      setFormState(res.ok ? 'success' : 'error');
+      const { serviceId, templateId, publicKey } = personal.emailjs;
+      await emailjs.send(
+        serviceId,
+        templateId,
+        {
+          from_name:    formData.name,
+          from_email:   formData.email,
+          budget:       formData.budget || 'Not specified',
+          message:      formData.message,
+          to_email:     personal.email,
+          sent_at:      new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+        },
+        publicKey,
+      );
+      setFormState('success');
     } catch {
       setFormState('error');
     }
