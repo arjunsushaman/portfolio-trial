@@ -165,7 +165,7 @@ export default function Projects() {
 
           {/* Sticky image preview panel */}
           <div className="sticky top-32 self-start">
-            <div className="relative rounded-2xl overflow-hidden aspect-[4/3] card-glass">
+            <div className="relative rounded-2xl overflow-hidden aspect-[16/10] lg:aspect-[16/9] card-glass">
               <AnimatePresence mode="wait">
                 {hoveredProject ? (
                   <motion.div
@@ -183,11 +183,15 @@ export default function Projects() {
                       className="object-cover"
                       sizes="40vw"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <p className="font-mono text-[9px] text-white/35 tracking-[0.2em] uppercase mb-1">{hoveredProject.client}</p>
-                      <p className="font-syne text-lg font-bold text-white">{hoveredProject.title}</p>
-                      <p className="font-grotesk text-xs text-white/50 mt-1 line-clamp-2">{hoveredProject.description}</p>
+                    {/* Layer 1: full-image darkening vignette — works on both light & dark images */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
+                    {/* Layer 2: solid dark scrim behind the text so copy is always legible */}
+                    <div className="absolute bottom-0 left-0 right-0 p-5"
+                      style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.55) 60%, transparent 100%)' }}
+                    >
+                      <p className="font-mono text-[9px] text-white/60 tracking-[0.2em] uppercase mb-1">{hoveredProject.client}</p>
+                      <p className="font-syne text-lg font-bold text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">{hoveredProject.title}</p>
+                      <p className="font-grotesk text-xs text-white/70 mt-1 line-clamp-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">{hoveredProject.description}</p>
                       {hoveredProject.liveUrl && hoveredProject.liveUrl !== '#' && (
                         <a
                           href={hoveredProject.liveUrl}

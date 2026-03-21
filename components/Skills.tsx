@@ -9,7 +9,7 @@ import SkillCard from '@/components/ui/SkillCard';
 // All individual skills for the marquee
 const allSkills = [
   'React', 'Next.js', 'Angular', 'React Native', 'TypeScript', 'Tailwind CSS', 'Framer Motion', 'Three.js', 'WebGL',
-  'Shopify', 'Strapi', 'CMS', 'WordPress', 'Elementor', 'WebSockets', 'Contentful', 'Stripe',
+  'Shopify', 'Strapi', 'CMS', 'WordPress', 'Yoast SEO', 'Elementor', 'WebSockets', 'Contentful', 'Stripe',
   'GraphQL', 'REST APIs', 'Vercel', 'Figma', 'Git', 'Jest', 'Vitest', 'CI/CD',
   'Vue.js', 'Node.js', 'Supabase', 'Prisma',
 ];

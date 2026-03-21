@@ -54,7 +54,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
         transition={{ duration: 0.2 }}
       >
         {/* Image */}
-        <div className="relative overflow-hidden h-52 bg-surface">
+        <div className="relative overflow-hidden aspect-[16/10] md:aspect-[16/9] bg-surface">
           <Image
             src={project.imageUrl}
             alt={project.title}
